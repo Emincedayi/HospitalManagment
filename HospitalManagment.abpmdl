@@ -1,0 +1,101 @@
+{
+  "template": "app",
+  "imports": {
+    "Volo.Abp.LeptonXLiteTheme": {
+      "version": "4.2.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.Account": {
+      "version": "9.2.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.OpenIddict": {
+      "version": "9.2.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.Identity": {
+      "version": "9.2.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.TenantManagement": {
+      "version": "9.2.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "9.2.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.PermissionManagement": {
+      "version": "9.2.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "9.2.1",
+      "isInstalled": true
+    }
+  },
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "HospitalManagment.Application": {
+      "path": "src/HospitalManagment.Application/HospitalManagment.Application.abppkg",
+      "folder": "src"
+    },
+    "HospitalManagment.Application.Tests": {
+      "path": "test/HospitalManagment.Application.Tests/HospitalManagment.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "HospitalManagment.Domain.Shared": {
+      "path": "src/HospitalManagment.Domain.Shared/HospitalManagment.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "HospitalManagment.Application.Contracts": {
+      "path": "src/HospitalManagment.Application.Contracts/HospitalManagment.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "HospitalManagment.HttpApi": {
+      "path": "src/HospitalManagment.HttpApi/HospitalManagment.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "HospitalManagment.HttpApi.Client": {
+      "path": "src/HospitalManagment.HttpApi.Client/HospitalManagment.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "HospitalManagment.EntityFrameworkCore.Tests": {
+      "path": "test/HospitalManagment.EntityFrameworkCore.Tests/HospitalManagment.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "HospitalManagment.EntityFrameworkCore": {
+      "path": "src/HospitalManagment.EntityFrameworkCore/HospitalManagment.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "HospitalManagment.TestBase": {
+      "path": "test/HospitalManagment.TestBase/HospitalManagment.TestBase.abppkg",
+      "folder": "test"
+    },
+    "HospitalManagment.Domain.Tests": {
+      "path": "test/HospitalManagment.Domain.Tests/HospitalManagment.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "HospitalManagment.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/HospitalManagment.HttpApi.Client.ConsoleTestApp/HospitalManagment.HttpApi.Client.ConsoleTestApp.abppkg",
+      "folder": "test"
+    },
+    "HospitalManagment.DbMigrator": {
+      "path": "src/HospitalManagment.DbMigrator/HospitalManagment.DbMigrator.abppkg",
+      "folder": "src"
+    },
+    "HospitalManagment.Blazor": {
+      "path": "src/HospitalManagment.Blazor/HospitalManagment.Blazor.abppkg",
+      "folder": "src"
+    },
+    "HospitalManagment.Domain": {
+      "path": "src/HospitalManagment.Domain/HospitalManagment.Domain.abppkg",
+      "folder": "src"
+    }
+  }
+}
