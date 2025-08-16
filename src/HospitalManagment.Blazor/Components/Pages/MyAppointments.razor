@@ -1,0 +1,103 @@
+﻿@page "/my-appointments"
+@using HospitalManagement.Appointments
+@using HospitalManagement.Doctors
+@using Volo.Abp.Application.Dtos
+@inject IAppointmentAppService AppointmentAppService
+@inject IDoctorAppService DoctorAppService
+
+<h3>Randevularım</h3>
+
+<button class="btn btn-primary mb-2" @onclick="ShowCreateModal">+ Yeni Randevu</button>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Doktor</th>
+            <th>Başlangıç</th>
+            <th>Bitiş</th>
+            <th>Durum</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var appt in appointments)
+        {
+            <tr>
+                <td>@appt.DoctorId</td>
+                <td>@appt.StartTime</td>
+                <td>@appt.EndTime</td>
+                <td>@appt.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (showModal)
+{
+    <div class="modal fade show d-block" style="background-color:rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Randevu</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <select class="form-control mb-2" @bind="selectedDoctorId">
+                        <option value="">Doktor Seç</option>
+                        @foreach (var doc in doctors)
+                        {
+                            <option value="@doc.Id">@doc.CreationTime</option>
+                        }
+                    </select>
+                    <input type="datetime-local" class="form-control mb-2" @bind="startTime" />
+                    <input type="datetime-local" class="form-control mb-2" @bind="endTime" />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Kapat</button>
+                    <button class="btn btn-primary" @onclick="SaveAppointment">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<AppointmentDto> appointments = new();
+    private List<DoctorDto> doctors = new();
+    private bool showModal = false;
+    private Guid selectedDoctorId;
+    private DateTime startTime;
+    private DateTime endTime;
+
+    protected override async Task OnInitializedAsync()
+    {
+       // var result = await AppointmentAppService.GetAsync();
+       // appointments = result.ToList();
+
+        var doctorResult = await DoctorAppService.GetListAsync(new PagedAndSortedResultRequestDto());
+        doctors = doctorResult.Items.ToList();
+    }
+
+    private void ShowCreateModal()
+    {
+        showModal = true;
+        startTime = DateTime.Now;
+        endTime = DateTime.Now.AddMinutes(30);
+    }
+
+    private async Task SaveAppointment()
+    {
+        await AppointmentAppService.CreateAsync(new CreateAppointmentDto
+        {
+            DoctorId = selectedDoctorId,
+            StartTime = startTime,
+            EndTime = endTime
+        });
+
+       // var result = await AppointmentAppService.();
+       // appointments = result.ToList();
+
+        CloseModal();
+    }
+
+    private void CloseModal() => showModal = false;
+}
