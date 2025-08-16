@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MiNET" Version="1.0.2304" />
     <PackageReference Include="Volo.Abp.PermissionManagement.HttpApi" Version="9.2.1" />
     <PackageReference Include="Volo.Abp.FeatureManagement.HttpApi" Version="9.2.1" />
     <PackageReference Include="Volo.Abp.SettingManagement.HttpApi" Version="9.2.1" />

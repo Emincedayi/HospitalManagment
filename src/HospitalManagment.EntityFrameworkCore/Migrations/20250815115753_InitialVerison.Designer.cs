@@ -3,6 +3,7 @@ using System;
 using HospitalManagment.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Volo.Abp.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace HospitalManagment.Migrations
 {
     [DbContext(typeof(HospitalManagmentDbContext))]
-    partial class HospitalManagmentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250815115753_InitialVerison")]
+    partial class InitialVerison
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

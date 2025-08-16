@@ -1,3 +1,7 @@
+﻿using HospitalManagement.Appointments;
+using HospitalManagement.Departments;
+using HospitalManagement.Doctors;
+using HospitalManagement.Patients;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -9,9 +13,9 @@ using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.EntityFrameworkCore;
+using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
-using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 
@@ -57,6 +61,11 @@ public class HospitalManagmentDbContext :
 
     #endregion
 
+    public DbSet<Department> Departments { get; set; }
+    public DbSet<Doctor> Doctors { get; set; }
+    public DbSet<Patient> Patients { get; set; }
+    public DbSet<Appointment> Appointments { get; set; }
+
     public HospitalManagmentDbContext(DbContextOptions<HospitalManagmentDbContext> options)
         : base(options)
     {
@@ -78,7 +87,36 @@ public class HospitalManagmentDbContext :
         builder.ConfigureOpenIddict();
         builder.ConfigureTenantManagement();
         builder.ConfigureBlobStoring();
-        
+
+        // Department → Doctor (One-to-Many)
+        builder.Entity<Department>()
+            .HasMany(d => d.Doctors)
+            .WithOne(doc => doc.Department)
+            .HasForeignKey(doc => doc.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Doctor → Appointment (One-to-Many)
+        builder.Entity<Doctor>()
+            .HasMany(d => d.Appointments)
+            .WithOne(a => a.Doctor)
+            .HasForeignKey(a => a.DoctorId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Patient → Appointment (One-to-Many)
+        builder.Entity<Patient>()
+            .HasMany(p => p.Appointments)
+            .WithOne(a => a.Patient)
+            .HasForeignKey(a => a.PatientId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Appointment zaman alanlarının zorunlu olması
+        builder.Entity<Appointment>()
+            .Property(a => a.StartTime)
+            .IsRequired();
+
+        builder.Entity<Appointment>()
+            .Property(a => a.EndTime)
+            .IsRequired();
         /* Configure your own tables/entities inside here */
 
         //builder.Entity<YourEntity>(b =>

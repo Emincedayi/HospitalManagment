@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\HospitalManagment.Domain\HospitalManagment.Domain.csproj" />
     <ProjectReference Include="..\HospitalManagment.Application.Contracts\HospitalManagment.Application.Contracts.csproj" />
+    <ProjectReference Include="..\HospitalManagment.EntityFrameworkCore\HospitalManagment.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

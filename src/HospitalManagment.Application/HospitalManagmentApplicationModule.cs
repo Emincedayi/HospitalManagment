@@ -6,16 +6,19 @@ using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Modularity;
 using Volo.Abp.TenantManagement;
+using HospitalManagment.EntityFrameworkCore;
 
 namespace HospitalManagment;
 
 [DependsOn(
     typeof(HospitalManagmentDomainModule),
+    typeof(HospitalManagmentEntityFrameworkCoreModule),
     typeof(HospitalManagmentApplicationContractsModule),
     typeof(AbpPermissionManagementApplicationModule),
     typeof(AbpFeatureManagementApplicationModule),
     typeof(AbpIdentityApplicationModule),
     typeof(AbpAccountApplicationModule),
+    typeof(AbpAutoMapperModule),
     typeof(AbpTenantManagementApplicationModule),
     typeof(AbpSettingManagementApplicationModule)
     )]
