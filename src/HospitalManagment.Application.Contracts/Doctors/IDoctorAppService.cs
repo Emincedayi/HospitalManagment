@@ -1,18 +1,13 @@
-﻿using HospitalManagement.Departments;
-using HospitalManagement.Doctors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 
-namespace HospitalManagment.Doctors
+namespace HospitalManagement.Doctors;
+
+public interface IDoctorAppService :
+    ICrudAppService<DoctorDto, Guid, PagedAndSortedResultRequestDto, CreateUpdateDoctorDto>
 {
-    public interface IDoctorAppService : IApplicationService
-    {
-        Task<DoctorDto> CreateAsync(DoctorDto appointment);
-        Task DeleteAsync(Guid id);
-    }
+    Task SetAvailabilityNotesAsync(Guid id, string? notes);
+    Task<int> GetTodayAppointmentCountAsync(Guid doctorId, DateTime today);
 }

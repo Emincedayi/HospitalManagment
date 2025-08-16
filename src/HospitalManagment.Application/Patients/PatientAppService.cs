@@ -1,28 +1,13 @@
-﻿using HospitalManagement.Patients;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Domain.Repositories;
 
-namespace HospitalManagment.Patients
+namespace HospitalManagement.Patients;
+
+public class PatientAppService : CrudAppService<
+    Patient, PatientDto, Guid, PagedAndSortedResultRequestDto,
+    CreateUpdatePatientDto>, IPatientAppService
 {
-    public class PatientAppService : ApplicationService, IPatientAppService
-    {  
-        private readonly IPatientRepository _patientRepository;
-        public PatientAppService(IPatientRepository patientRepository)
-        {
-            _patientRepository = patientRepository;
-        }
-        public Task<PatientDto> CreateAsync(PatientDto appointment)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task DeleteAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    public PatientAppService(IRepository<Patient, Guid> repository) : base(repository) { }
 }

@@ -1,17 +1,20 @@
 ﻿using System;
 using Volo.Abp.Application.Dtos;
 
-namespace HospitalManagement.Doctors
-{
-    public class DoctorDto : EntityDto<Guid>
-    {
-        public string FullName { get; set; }
-        public Guid DepartmentId { get; set; }
-    }
+namespace HospitalManagement.Doctors;
 
-    public class CreateUpdateDoctorDto
-    {
-        public string FullName { get; set; }
-        public Guid DepartmentId { get; set; }
-    }
+public class DoctorDto : AuditedEntityDto<Guid>
+{
+    public Guid UserId { get; set; }
+    public Guid DepartmentId { get; set; }
+    public string? Specialty { get; set; }
+    public string? AvailabilityNotes { get; set; }
+}
+
+public class CreateUpdateDoctorDto
+{
+    public Guid UserId { get; set; }
+    public Guid DepartmentId { get; set; }
+    public string? Specialty { get; set; }
+    public string? AvailabilityNotes { get; set; }
 }

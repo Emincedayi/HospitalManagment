@@ -88,35 +88,63 @@ public class HospitalManagmentDbContext :
         builder.ConfigureTenantManagement();
         builder.ConfigureBlobStoring();
 
-        // Department → Doctor (One-to-Many)
-        builder.Entity<Department>()
-            .HasMany(d => d.Doctors)
-            .WithOne(doc => doc.Department)
-            .HasForeignKey(doc => doc.DepartmentId)
-            .OnDelete(DeleteBehavior.Restrict);
 
-        // Doctor → Appointment (One-to-Many)
-        builder.Entity<Doctor>()
-            .HasMany(d => d.Appointments)
-            .WithOne(a => a.Doctor)
-            .HasForeignKey(a => a.DoctorId)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Department>(b =>
+        {
+            b.ToTable("Departments");
+            b.Property(x => x.Name).IsRequired().HasMaxLength(128);
+            b.HasMany<Doctor>().WithOne().HasForeignKey(d => d.DepartmentId).OnDelete(DeleteBehavior.Restrict);
+        });
 
-        // Patient → Appointment (One-to-Many)
-        builder.Entity<Patient>()
-            .HasMany(p => p.Appointments)
-            .WithOne(a => a.Patient)
-            .HasForeignKey(a => a.PatientId)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Doctor>(b =>
+        {
+            b.ToTable("Doctors");
+            b.HasIndex(x => x.UserId).IsUnique(); // a user → at most one doctor-profile
+            b.HasOne<Department>().WithMany(d => d.Doctors).HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.Restrict);
+        });
 
-        // Appointment zaman alanlarının zorunlu olması
-        builder.Entity<Appointment>()
-            .Property(a => a.StartTime)
-            .IsRequired();
+        builder.Entity<Patient>(b =>
+        {
+            b.ToTable("Patients");
+            b.HasIndex(x => x.UserId).IsUnique(); // a user → at most one patient-profile
+        });
 
-        builder.Entity<Appointment>()
-            .Property(a => a.EndTime)
-            .IsRequired();
+        builder.Entity<Appointment>(b =>
+        {
+            b.ToTable("Appointments");
+            b.HasIndex(x => new { x.DoctorId, x.StartTime, x.EndTime });
+            b.HasOne<Doctor>().WithMany().HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.Restrict);
+            b.HasOne<Patient>().WithMany().HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.Restrict);
+        });
+        //// Department → Doctor (One-to-Many)
+        //builder.Entity<Department>()
+        //    .HasMany(d => d.Doctors)
+        //    .WithOne(doc => doc.Department)
+        //    .HasForeignKey(doc => doc.DepartmentId)
+        //    .OnDelete(DeleteBehavior.Restrict);
+
+        //// Doctor → Appointment (One-to-Many)
+        //builder.Entity<Doctor>()
+        //    .HasMany(d => d.Appointments)
+        //    .WithOne(a => a.Doctor)
+        //    .HasForeignKey(a => a.DoctorId)
+        //    .OnDelete(DeleteBehavior.Restrict);
+
+        //// Patient → Appointment (One-to-Many)
+        //builder.Entity<Patient>()
+        //    .HasMany(p => p.Appointments)
+        //    .WithOne(a => a.Patient)
+        //    .HasForeignKey(a => a.PatientId)
+        //    .OnDelete(DeleteBehavior.Restrict);
+
+        //// Appointment zaman alanlarının zorunlu olması
+        //builder.Entity<Appointment>()
+        //    .Property(a => a.StartTime)
+        //    .IsRequired();
+
+        //builder.Entity<Appointment>()
+        //    .Property(a => a.EndTime)
+        //    .IsRequired();
         /* Configure your own tables/entities inside here */
 
         //builder.Entity<YourEntity>(b =>

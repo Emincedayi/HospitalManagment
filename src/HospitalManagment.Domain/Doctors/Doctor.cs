@@ -1,24 +1,75 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using Volo.Abp.Domain.Entities.Auditing;
-using Volo.Abp.Identity;
 
-namespace HospitalManagement.Doctors
+namespace HospitalManagement.Doctors;
+
+public class Doctor : FullAuditedAggregateRoot<Guid>
 {
-    public class Doctor : AuditedAggregateRoot<Guid>
+    public Guid UserId { get; private set; } // FK → IdentityUser.Id
+    public Guid DepartmentId { get; private set; }
+    public string? Specialty { get; private set; }
+
+    // Optional simple availability flags/notes
+    public string? AvailabilityNotes { get; private set; }
+
+    private Doctor() { }
+
+    public Doctor(Guid id, Guid userId, Guid departmentId, string? specialty = null) : base(id)
     {
-        public Guid DepartmentId { get; set; }
-        public Departments.Department Department { get; set; }
+        UserId = userId;
+        DepartmentId = departmentId;
+        Specialty = specialty;
+    }
 
-        public ICollection<Appointments.Appointment> Appointments { get; set; } = new List<Appointments.Appointment>();
+    public Doctor SetSpecialty(string? specialty)
+    {
+        Specialty = specialty;
+        return this;
+    }
 
-        protected Doctor() { }
-
-        public Doctor(Guid id, string userName, string email, Guid departmentId)
-            : base()
-        {
-            DepartmentId = departmentId;
-        }
+    public Doctor SetAvailabilityNotes(string? notes)
+    {
+        AvailabilityNotes = notes;
+        return this;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//using Microsoft.AspNetCore.Identity;
+//using System;
+//using System.Collections.Generic;
+//using Volo.Abp.Domain.Entities.Auditing;
+//using Volo.Abp.Identity;
+
+//namespace HospitalManagement.Doctors
+//{
+//    public class Doctor : AuditedAggregateRoot<Guid>
+//    {
+//        public Guid DepartmentId { get; set; }
+//        public Departments.Department Department { get; set; }
+
+//        public ICollection<Appointments.Appointment> Appointments { get; set; } = new List<Appointments.Appointment>();
+
+//        protected Doctor() { }
+
+//        public Doctor(Guid id, string userName, string email, Guid departmentId)
+//            : base()
+//        {
+//            DepartmentId = departmentId;
+//        }
+//    }
+//}
