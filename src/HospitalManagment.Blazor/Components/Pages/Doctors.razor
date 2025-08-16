@@ -1,0 +1,217 @@
+﻿@* @page "/doctors"
+@using HospitalManagement.Departments
+@using HospitalManagement.Doctors
+@using Volo.Abp.Application.Dtos
+@inject IDoctorAppService DoctorAppService
+@inject IDepartmentAppService DepartmentAppService
+
+<h3>Doktor Yönetimi</h3>
+
+<button class="btn btn-primary mb-3" @onclick="ShowCreateModal">+ Yeni Doktor</button>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Ad Soyad</th>
+            <th>Uzmanlık</th>
+            <th>Departman</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var doc in doctors)
+        {
+            <tr>
+                <td>@doc.DepartmentId</td>
+                <td>@doc.Specialty</td>
+                <td>@departments.FirstOrDefault(d => d.Id == doc.DepartmentId)?.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (showModal)
+{
+    <div class="modal fade show d-block" style="background-color:rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Doktor</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <input class="form-control mb-2" placeholder="Ad Soyad" @bind="newDoctor.DepartmentId" />
+                    <input class="form-control mb-2" placeholder="Uzmanlık" @bind="newDoctor.Specialty" />
+
+                    <select class="form-control mb-2" @bind="newDoctor.DepartmentId">
+                        <option value="">Departman Seç</option>
+                        @foreach (var dept in departments)
+                        {
+                            <option value="@dept.Id">@dept.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Kapat</button>
+                    <button class="btn btn-primary" @onclick="SaveDoctor">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<DoctorDto> doctors = new();
+    private List<DepartmentDto> departments = new();
+    private bool showModal = false;
+
+    private CreateUpdateDoctorDto newDoctor = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        var docResult = await DoctorAppService.GetListAsync(new PagedAndSortedResultRequestDto());
+        doctors = docResult.Items.ToList();
+
+        var deptResult = await DepartmentAppService.GetListAsync(new PagedAndSortedResultRequestDto());
+        departments = deptResult.Items.ToList();
+    }
+
+    private void ShowCreateModal()
+    {
+        newDoctor = new CreateUpdateDoctorDto();
+        showModal = true;
+    }
+
+    private async Task SaveDoctor()
+    {
+        if (newDoctor.DepartmentId == Guid.Empty)
+        {
+            // Hata mesajı verebilirsin
+            return;
+        }
+
+        await DoctorAppService.CreateAsync(newDoctor);
+        await LoadDataAsync();
+        CloseModal();
+    }
+
+    private void CloseModal() => showModal = false;
+} *@ 
+
+@page "/doctors"
+@using HospitalManagement.Doctors
+@using HospitalManagement.Departments
+@using Volo.Abp.Application.Dtos
+@inject IDoctorAppService DoctorAppService
+@inject IDepartmentAppService DepartmentAppService
+@inject Volo.Abp.Identity.IIdentityUserAppService UserAppService
+
+<h3>Doktor Yönetimi</h3>
+
+<button class="btn btn-primary mb-3" @onclick="ShowCreateModal">+ Yeni Doktor</button>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Kullanıcı</th>
+            <th>Uzmanlık</th>
+            <th>Departman</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var doc in doctors)
+        {
+            <tr>
+                <td>@users.FirstOrDefault(u => u.Id == doc.UserId)?.UserName</td>
+                <td>@doc.Specialty</td>
+                <td>@departments.FirstOrDefault(d => d.Id == doc.DepartmentId)?.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (showModal)
+{
+    <div class="modal fade show d-block" style="background-color:rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Doktor</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <select class="form-control mb-2" @bind="newDoctor.UserId">
+                        <option value="">Kullanıcı Seç</option>
+                        @foreach (var u in users)
+                        {
+                            if (!doctors.Any(d => d.UserId == u.Id)) // zaten doktor değilse
+                                {<option value="@u.Id">@u.UserName</option>}
+                        }
+                    </select>
+
+                    <input class="form-control mb-2" placeholder="Uzmanlık" @bind="newDoctor.Specialty" />
+
+                    <select class="form-control mb-2" @bind="newDoctor.DepartmentId">
+                        <option value="">Departman Seç</option>
+                        @foreach (var dept in departments)
+                        {
+                            <option value="@dept.Id">@dept.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Kapat</button>
+                    <button class="btn btn-primary" @onclick="SaveDoctor">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<DoctorDto> doctors = new();
+    private List<DepartmentDto> departments = new();
+    private List<Volo.Abp.Identity.IdentityUserDto> users = new();
+    private bool showModal = false;
+    private CreateUpdateDoctorDto newDoctor = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        var docResult = await DoctorAppService.GetListAsync(new PagedAndSortedResultRequestDto());
+        doctors = docResult.Items.ToList();
+
+        var deptResult = await DepartmentAppService.GetListAsync(new PagedAndSortedResultRequestDto());
+        departments = deptResult.Items.ToList();
+
+        var userResult = await UserAppService.GetListAsync(new Volo.Abp.Identity.GetIdentityUsersInput { MaxResultCount = 1000 });
+        users = userResult.Items.ToList();
+    }
+
+    private void ShowCreateModal()
+    {
+        newDoctor = new CreateUpdateDoctorDto();
+        showModal = true;
+    }
+
+    private async Task SaveDoctor()
+    {
+        if (newDoctor.UserId == Guid.Empty || newDoctor.DepartmentId == Guid.Empty)
+            return;
+
+        await DoctorAppService.CreateAsync(newDoctor);
+        await LoadDataAsync();
+        CloseModal();
+    }
+
+    private void CloseModal() => showModal = false;
+}
+

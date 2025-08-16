@@ -1,0 +1,75 @@
+﻿@page "/patients/create"
+@using HospitalManagement.Patients
+@using Volo.Abp.Identity
+@inject IPatientAppService PatientAppService
+@inject IIdentityUserAppService UserAppService
+@inject NavigationManager NavigationManager
+
+<h3>Basit Hasta Oluşturma</h3>
+
+@if (Users == null)
+{
+    <p><em>Kullanıcı listesi yükleniyor...</em></p>
+}
+else
+{
+    <div class="mb-3">
+        <label>Kullanıcı Seç</label>
+        <select class="form-control" @bind="SelectedUserId">
+            <option value="">-- Seçiniz --</option>
+            @foreach (var user in Users)
+            {
+                <option value="@user.Id">@user.UserName (@user.Email)</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Doğum Tarihi</label>
+        <input type="date" class="form-control" @bind="DateOfBirth" />
+    </div>
+
+    <div class="mb-3">
+        <label>Notlar</label>
+        <textarea class="form-control" @bind="Notes"></textarea>
+    </div>
+
+    <button class="btn btn-primary" @onclick="CreatePatientAsync">Kaydet</button>
+}
+
+@code {
+    private List<IdentityUserDto> Users;
+    private Guid SelectedUserId;
+    private DateTime? DateOfBirth;
+    private string Notes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Doğru input tipi GetIdentityUsersInput kullanılıyor
+        var result = await UserAppService.GetListAsync(new GetIdentityUsersInput
+        {
+            MaxResultCount = 1000
+        });
+
+        Users = result.Items.ToList();
+    }
+
+    private async Task CreatePatientAsync()
+    {
+        if (SelectedUserId == Guid.Empty)
+        {
+            return; // kullanıcı seçilmeden submit yapılmasın
+        }
+
+        var dto = new CreateUpdatePatientDto
+        {
+            UserId = SelectedUserId,
+            DateOfBirth = DateOfBirth,
+            Notes = Notes
+        };
+
+        await PatientAppService.CreateAsync(dto);
+
+       
+    }
+}
