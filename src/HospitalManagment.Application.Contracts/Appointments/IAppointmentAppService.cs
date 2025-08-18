@@ -5,7 +5,7 @@ using Volo.Abp.Application.Services;
 
 namespace HospitalManagement.Appointments;
 
-public interface IAppointmentAppService :
+public interface IAppointmentAppService : 
     ICrudAppService<AppointmentDto, Guid, PagedAndSortedResultRequestDto, CreateAppointmentDto, UpdateAppointmentDto>
 {
     Task<AppointmentDto> ConfirmAsync(Guid id);
@@ -14,4 +14,4 @@ public interface IAppointmentAppService :
 
     Task<PagedResultDto<AppointmentDto>> GetListForDoctorAsync(Guid doctorId, DateTime? from = null, DateTime? to = null);
     Task<PagedResultDto<AppointmentDto>> GetListForPatientAsync(Guid patientId, DateTime? from = null, DateTime? to = null);
-}
+}//bunları implemente etmek lazım bunlar ile sadece işlem yapılmaz

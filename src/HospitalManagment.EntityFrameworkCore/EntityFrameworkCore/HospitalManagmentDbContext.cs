@@ -99,14 +99,14 @@ public class HospitalManagmentDbContext :
         builder.Entity<Doctor>(b =>
         {
             b.ToTable("Doctors");
-            b.HasIndex(x => x.UserId).IsUnique(); // a user → at most one doctor-profile
+            b.HasIndex(x => x.UserId).IsUnique(); 
             b.HasOne<Department>().WithMany(d => d.Doctors).HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.Restrict);
         });
 
         builder.Entity<Patient>(b =>
         {
             b.ToTable("Patients");
-            b.HasIndex(x => x.UserId).IsUnique(); // a user → at most one patient-profile
+            b.HasIndex(x => x.UserId).IsUnique(); 
         });
 
         builder.Entity<Appointment>(b =>

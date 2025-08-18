@@ -1,111 +1,6 @@
 ﻿@* @page "/my-appointments"
 @using HospitalManagement.Appointments
 @using HospitalManagement.Doctors
-@using Volo.Abp.Application.Dtos
-@inject IAppointmentAppService AppointmentAppService
-@inject IDoctorAppService DoctorAppService
-
-<h3>Randevularım</h3>
-
-<button class="btn btn-primary mb-2" @onclick="ShowCreateModal">+ Yeni Randevu</button>
-
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th>Doktor</th>
-            <th>Başlangıç</th>
-            <th>Bitiş</th>
-            <th>Durum</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var appt in appointments)
-        {
-            <tr>
-                <td>@appt.DoctorId</td>
-                <td>@appt.StartTime</td>
-                <td>@appt.EndTime</td>
-                <td>@appt.Status</td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-@if (showModal)
-{
-    <div class="modal fade show d-block" style="background-color:rgba(0,0,0,0.5);">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Yeni Randevu</h5>
-                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
-                </div>
-                <div class="modal-body">
-                    <select class="form-control mb-2" @bind="selectedDoctorId">
-                        <option value="">Doktor Seç</option>
-                        @foreach (var doc in doctors)
-                        {
-                            <option value="@doc.Id">@doc.CreationTime</option>
-                        }
-                    </select>
-                    <input type="datetime-local" class="form-control mb-2" @bind="startTime" />
-                    <input type="datetime-local" class="form-control mb-2" @bind="endTime" />
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" @onclick="CloseModal">Kapat</button>
-                    <button class="btn btn-primary" @onclick="SaveAppointment">Kaydet</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-@code {
-    private List<AppointmentDto> appointments = new();
-    private List<DoctorDto> doctors = new();
-    private bool showModal = false;
-    private Guid selectedDoctorId;
-    private DateTime startTime;
-    private DateTime endTime;
-
-    protected override async Task OnInitializedAsync()
-    {
-       // var result = await AppointmentAppService.GetAsync();
-       // appointments = result.ToList();
-
-        var doctorResult = await DoctorAppService.GetListAsync(new PagedAndSortedResultRequestDto());
-        doctors = doctorResult.Items.ToList();
-    }
-
-    private void ShowCreateModal()
-    {
-        showModal = true;
-        startTime = DateTime.Now;
-        endTime = DateTime.Now.AddMinutes(30);
-    }
-
-    private async Task SaveAppointment()
-    {
-        await AppointmentAppService.CreateAsync(new CreateAppointmentDto
-        {
-            DoctorId = selectedDoctorId,
-            StartTime = startTime,
-            EndTime = endTime
-        });
-
-       // var result = await AppointmentAppService.();
-       // appointments = result.ToList();
-
-        CloseModal();
-    }
-
-    private void CloseModal() => showModal = false;
-} *@
- 
-
-@page "/my-appointments"
-@using HospitalManagement.Appointments
-@using HospitalManagement.Doctors
 @using HospitalManagement.Patients
 @using Volo.Abp.Application.Dtos
 @inject IAppointmentAppService AppointmentAppService
@@ -224,7 +119,7 @@
     {
         if (selectedDoctorId == Guid.Empty || selectedPatientId == Guid.Empty)
         {
-            return; // seçim yapılmadıysa kaydetme
+            return; //seçim yapılmadıysa kaydetme
         }
 
         var dto = new CreateAppointmentDto
@@ -250,5 +145,497 @@
             Notes = notes,
             Status = AppointmentStatus.Confirmed
         });
+    }
+} *@ 
+
+@* 
+
+@page "/my-appointments"
+@using HospitalManagement.Appointments
+@using HospitalManagement.Doctors
+@using HospitalManagement.Patients
+@using Volo.Abp.Application.Dtos
+@using Volo.Abp
+@inject IAppointmentAppService AppointmentAppService
+@inject IDoctorAppService DoctorAppService
+@inject IPatientAppService PatientAppService
+
+<h3>Randevularım</h3>
+
+<button class="btn btn-primary mb-2" @onclick="ShowCreateModal">+ Yeni Randevu</button>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Doktor</th>
+            <th>Hasta</th>
+            <th>Başlangıç</th>
+            <th>Bitiş</th>
+            <th>Durum</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var appt in appointments)
+        {
+            <tr>
+                <td>@doctors.FirstOrDefault(d => d.Id == appt.DoctorId)?.UserId</td>
+                <td>@patients.FirstOrDefault(p => p.Id == appt.PatientId)?.UserId</td>
+                <td>@appt.StartTime</td>
+                <td>@appt.EndTime</td>
+                <td>@appt.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (showModal)
+{
+    <div class="modal fade show d-block" style="background-color:rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Randevu</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <label>Doktor Seç</label>
+                    <select class="form-control mb-2" @bind="selectedDoctorId">
+                        <option value="">Doktor Seç</option>
+                        @foreach (var doc in doctors)
+                        {
+                            <option value="@doc.Id">@doc.UserId</option>
+                        }
+                    </select>
+
+                    <label>Hasta Seç</label>
+                    <select class="form-control mb-2" @bind="selectedPatientId">
+                        <option value="">Hasta Seç</option>
+                        @foreach (var pat in patients)
+                        {
+                            <option value="@pat.Id">@pat.UserId</option>
+                        }
+                    </select>
+
+                    <label>Başlangıç</label>
+                    <input type="datetime-local" class="form-control mb-2" @bind="startTime" />
+                    <label>Bitiş</label>
+                    <input type="datetime-local" class="form-control mb-2" @bind="endTime" />
+                    <label>Notlar</label>
+                    <textarea class="form-control mb-2" @bind="notes"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Kapat</button>
+                    <button class="btn btn-primary" @onclick="SaveAppointment">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<AppointmentDto> appointments = new();
+    private List<DoctorDto> doctors = new();
+    private List<PatientDto> patients = new();
+    private bool showModal = false;
+    private Guid selectedDoctorId;
+    private Guid selectedPatientId;
+    private DateTime startTime;
+    private DateTime endTime;
+    private string notes;
+    private string errorMessage; // hata mesajı göstermek için
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Doctor ve Patient listelerini yükle
+        var doctorResult = await DoctorAppService.GetListAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+        doctors = doctorResult.Items.ToList();
+
+        var patientResult = await PatientAppService.GetListAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+        patients = patientResult.Items.ToList();
+
+        // Mevcut randevuları yükle (örnek: tüm liste)
+        var apptResult = await AppointmentAppService.GetListAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+        appointments = apptResult.Items.ToList();
+    }
+
+    private void ShowCreateModal()
+    {
+        errorMessage = string.Empty;
+        showModal = true;
+        startTime = DateTime.Now;
+        endTime = DateTime.Now.AddMinutes(30);
+        selectedDoctorId = Guid.Empty;
+        selectedPatientId = Guid.Empty;
+        notes = string.Empty;
+    }
+
+    private void CloseModal() => showModal = false;
+
+    private async Task SaveAppointment()
+    {
+        if (selectedDoctorId == Guid.Empty || selectedPatientId == Guid.Empty)
+        {
+            errorMessage = "Lütfen doktor ve hasta seçiniz.";
+            return;
+        }
+
+        var dto = new CreateAppointmentDto
+        {
+            DoctorId = selectedDoctorId,
+            PatientId = selectedPatientId,
+            StartTime = startTime,
+            EndTime = endTime,
+            Notes = notes
+        };
+
+        try
+        {
+            var created = await AppointmentAppService.CreateAsync(dto);
+
+            CloseModal();
+
+            appointments.Add(created); // servisten dönen dto'yu ekliyoruz
+        }
+        catch (BusinessException ex)
+        {
+            errorMessage = ex.Message; // ABP’den gelen hata mesajını ekrana bas
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Bir hata oluştu: " + ex.Message;
+        }
+    }
+}
+ *@
+  
+@page "/my-appointments"
+@using HospitalManagement.Appointments
+@using HospitalManagement.Doctors
+@using HospitalManagement.Patients
+@using Volo.Abp.Application.Dtos
+@using Volo.Abp
+@inject IAppointmentAppService AppointmentAppService
+@inject IDoctorAppService DoctorAppService
+@inject IPatientAppService PatientAppService
+
+<h3>Randevularım</h3>
+
+<button class="btn btn-primary mb-2" @onclick="ShowCreateModal">+ Yeni Randevu</button>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Doktor</th>
+            <th>Hasta</th>
+            <th>Başlangıç</th>
+            <th>Bitiş</th>
+            <th>Durum</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var appt in appointments)
+        {
+            <tr>
+                <td>@doctors.FirstOrDefault(d => d.Id == appt.DoctorId)?.UserId</td>
+                <td>@patients.FirstOrDefault(p => p.Id == appt.PatientId)?.UserId</td>
+                <td>@appt.StartTime</td>
+                <td>@appt.EndTime</td>
+                <td>@appt.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (showModal)
+{
+    <div class="modal fade show d-block" style="background-color:rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Randevu</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Doktor</label>
+                            <select class="form-select"
+                                    value="@selectedDoctorIdString"
+                                    @onchange="OnDoctorChanged">
+                                <option value="">Doktor Seç</option>
+                                @foreach (var doc in doctors)
+                                {
+                                    <option value="@doc.Id.ToString()">@doc.UserId</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Hasta</label>
+                            <select class="form-select"
+                                    value="@selectedPatientIdString"
+                                    @onchange="OnPatientChanged">
+                                <option value="">Hasta Seç</option>
+                                @foreach (var pat in patients)
+                                {
+                                    <option value="@pat.Id.ToString()">@pat.UserId</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Tarih</label>
+                            <input type="date"
+                                   class="form-control"
+                                   value="@selectedDateString"
+                                   @onchange="OnDateChanged" />
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label">Uygun Saatler (30 dk aralıklarla)</label>
+                        <div class="d-flex flex-wrap">
+                            @if (timeSlots.Count == 0)
+                            {
+                                <span class="text-muted">Doktor ve tarih seçiniz.</span>
+                            }
+                            else
+                            {
+                                @foreach (var slot in timeSlots)
+                                {
+                                    var isSelected = slot.Start == startTime && slot.End == endTime;
+                                    <button class="btn btn-sm m-1 @(slot.IsAvailable ? (isSelected ? "btn-primary" : "btn-success") : "btn-danger")"
+                                            disabled="@(!slot.IsAvailable)"
+                                            title="@(slot.IsAvailable ? "Uygun" : "Dolu")"
+                                            @onclick="() => SelectSlot(slot)">
+                                        @slot.Start.ToString("HH\\:mm") - @slot.End.ToString("HH\\:mm")
+                                    </button>
+                                }
+                            }
+                        </div>
+                        @if (startTime != default)
+                        {
+                            <div class="form-text">
+                                Seçilen Slot: <strong>@startTime.ToString("dd.MM.yyyy HH:mm")</strong> - <strong>@endTime.ToString("HH:mm")</strong>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label">Notlar</label>
+                        <textarea class="form-control" @bind="notes"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Kapat</button>
+                    <button class="btn btn-primary" @onclick="SaveAppointment">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    // ---------- State ----------
+    private List<AppointmentDto> appointments = new();
+    private List<AppointmentDto> allAppointments = new(); // slot hesabı için tüm kayıtlar
+    private List<DoctorDto> doctors = new();
+    private List<PatientDto> patients = new();
+
+    private bool showModal = false;
+    private Guid selectedDoctorId;
+    private Guid selectedPatientId;
+    private DateTime selectedDate = DateTime.Today;
+
+    // string binding helpers
+    private string selectedDoctorIdString
+    {
+        get => selectedDoctorId == Guid.Empty ? "" : selectedDoctorId.ToString();
+        set => selectedDoctorId = string.IsNullOrWhiteSpace(value) ? Guid.Empty : Guid.Parse(value);
+    }
+
+    private string selectedPatientIdString
+    {
+        get => selectedPatientId == Guid.Empty ? "" : selectedPatientId.ToString();
+        set => selectedPatientId = string.IsNullOrWhiteSpace(value) ? Guid.Empty : Guid.Parse(value);
+    }
+
+    private string selectedDateString
+    {
+        get => selectedDate.ToString("yyyy-MM-dd");
+        set
+        {
+            if (DateTime.TryParse(value, out var d))
+                selectedDate = d.Date;
+        }
+    }
+
+    private DateTime startTime;
+    private DateTime endTime;
+    private string notes = "";
+    private string errorMessage = "";
+
+    private List<TimeSlot> timeSlots = new();
+
+    // ---------- Lifecycle ----------
+    protected override async Task OnInitializedAsync()
+    {
+        var doctorResult = await DoctorAppService.GetListAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+        doctors = doctorResult.Items.ToList();
+
+        var patientResult = await PatientAppService.GetListAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+        patients = patientResult.Items.ToList();
+
+        var apptResult = await AppointmentAppService.GetListAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+        appointments = apptResult.Items.ToList();
+        allAppointments = new List<AppointmentDto>(appointments);
+    }
+
+    // ---------- Modal ----------
+    private void ShowCreateModal()
+    {
+        errorMessage = string.Empty;
+        showModal = true;
+
+        selectedDate = DateTime.Today;
+        selectedDoctorId = Guid.Empty;
+        selectedPatientId = Guid.Empty;
+        notes = string.Empty;
+        startTime = default;
+        endTime = default;
+        timeSlots.Clear();
+    }
+
+    private void CloseModal() => showModal = false;
+
+    // ---------- Change handlers ----------
+    private async Task OnDoctorChanged(ChangeEventArgs e)
+    {
+        selectedDoctorIdString = e.Value?.ToString() ?? "";
+        await BuildTimeSlotsAsync();
+    }
+
+    private async Task OnPatientChanged(ChangeEventArgs e)
+    {
+        selectedPatientIdString = e.Value?.ToString() ?? "";
+        await Task.CompletedTask;
+    }
+
+    private async Task OnDateChanged(ChangeEventArgs e)
+    {
+        selectedDateString = e.Value?.ToString() ?? DateTime.Today.ToString("yyyy-MM-dd");
+        await BuildTimeSlotsAsync();
+    }
+
+    // ---------- Slot hesaplama ----------
+    private async Task BuildTimeSlotsAsync()
+    {
+        timeSlots.Clear();
+        startTime = default;
+        endTime = default;
+
+        if (selectedDoctorId == Guid.Empty || selectedDate == default)
+            return;
+
+        // Gerekirse yeni randevuları da çek (liste güncel kalsın)
+        // Basit yaklaşım: her seferinde çek
+        var apptResult = await AppointmentAppService.GetListAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+        allAppointments = apptResult.Items.ToList();
+
+        var dayStart = selectedDate.Date.AddHours(8);   // 08:00
+        var dayEnd = selectedDate.Date.AddHours(23);  // 17:00
+
+        // Seçilen doktora ait, ilgili gündeki randevular
+        var doctorDayAppointments = allAppointments
+            .Where(a => a.DoctorId == selectedDoctorId &&
+                        a.StartTime.Date == selectedDate.Date &&
+                        a.Status != AppointmentStatus.Cancelled)
+            .ToList();
+
+        var cursor = dayStart;
+        while (cursor < dayEnd)
+        {
+            var slotStart = cursor;
+            var slotEnd = cursor.AddMinutes(30);
+
+            bool overlaps = doctorDayAppointments.Any(a =>
+                slotStart < a.EndTime && slotEnd > a.StartTime);
+
+            timeSlots.Add(new TimeSlot
+            {
+                Start = slotStart,
+                End = slotEnd,
+                IsAvailable = !overlaps
+            });
+
+            cursor = slotEnd;
+        }
+    }
+
+    private void SelectSlot(TimeSlot slot)
+    {
+        if (!slot.IsAvailable) return;
+        startTime = slot.Start;
+        endTime = slot.End;
+
+        // Seçildiğini görsel olarak işaretlemek için (btn-primary)
+        StateHasChanged();
+    }
+
+    // ---------- Kaydet ----------
+    private async Task SaveAppointment()
+    {
+        if (selectedDoctorId == Guid.Empty || selectedPatientId == Guid.Empty || startTime == default)
+        {
+            errorMessage = "Lütfen doktor, hasta ve saat seçiniz.";
+            return;
+        }
+
+        var dto = new CreateAppointmentDto
+        {
+            DoctorId = selectedDoctorId,
+            PatientId = selectedPatientId,
+            StartTime = startTime,
+            EndTime = endTime,
+            Notes = notes
+        };
+
+        try
+        {
+            var created = await AppointmentAppService.CreateAsync(dto);
+
+            // UI listelerini güncelle
+            appointments.Add(created);
+            allAppointments.Add(created);
+
+            CloseModal();
+        }
+        catch (BusinessException ex)
+        {
+            errorMessage = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Bir hata oluştu: " + ex.Message;
+        }
+    }
+
+    // ---------- Helpers ----------
+    private sealed class TimeSlot
+    {
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public bool IsAvailable { get; set; }
     }
 }

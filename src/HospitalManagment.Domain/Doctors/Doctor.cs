@@ -18,7 +18,8 @@ public class Doctor : FullAuditedAggregateRoot<Guid>
     {
         UserId = userId;
         DepartmentId = departmentId;
-        Specialty = specialty;
+        Specialty = specialty; 
+      
     }
 
     public Doctor SetSpecialty(string? specialty)
